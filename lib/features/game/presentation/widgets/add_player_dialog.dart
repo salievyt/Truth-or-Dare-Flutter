@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import 'liquid_glass/liquid_glass_container.dart';
+import '../../../../core/widgets/liquid_glass/liquid_glass_container.dart';
 
 class AddPlayerDialog extends StatefulWidget {
   const AddPlayerDialog({super.key});

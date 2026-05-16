@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
-import '../bloc/game_bloc.dart';
-import '../bloc/game_state.dart';
-import '../models/game_phase.dart';
-import '../screens/game_screen.dart';
-import '../screens/setup_screen.dart';
+import '../features/game/domain/entities/game_phase.dart';
+import '../features/game/presentation/bloc/game_bloc.dart';
+import '../features/game/presentation/bloc/game_state.dart';
+import '../features/game/presentation/screens/game_screen.dart';
+import '../features/game/presentation/screens/setup_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 

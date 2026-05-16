@@ -9,18 +9,14 @@ abstract class GameEvent extends Equatable {
 
 class AddPlayer extends GameEvent {
   final String name;
-
   const AddPlayer(this.name);
-
   @override
   List<Object?> get props => [name];
 }
 
 class RemovePlayer extends GameEvent {
   final String playerId;
-
   const RemovePlayer(this.playerId);
-
   @override
   List<Object?> get props => [playerId];
 }
@@ -31,9 +27,7 @@ class StartGame extends GameEvent {
 
 class SpinWheel extends GameEvent {
   final double? velocity;
-
   const SpinWheel({this.velocity});
-
   @override
   List<Object?> get props => [velocity];
 }

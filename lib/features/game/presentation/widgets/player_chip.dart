@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 
-import '../models/player.dart';
+import '../../domain/entities/player.dart';
 
 class PlayerChip extends StatelessWidget {
   final Player player;
@@ -61,9 +61,7 @@ class PlayerChip extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                   color: isActive
                       ? CupertinoColors.white
-                      : (isDark
-                          ? CupertinoColors.white
-                          : CupertinoColors.black),
+                      : (isDark ? CupertinoColors.white : CupertinoColors.black),
                 ),
               ),
               if (onRemove != null) ...[

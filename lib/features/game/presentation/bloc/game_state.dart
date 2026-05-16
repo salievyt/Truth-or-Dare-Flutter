@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../models/game_phase.dart';
-import '../models/player.dart';
+import '../../domain/entities/game_phase.dart';
+import '../../domain/entities/player.dart';
 
 class GameState extends Equatable {
   final List<Player> players;

@@ -2,15 +2,16 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/utils/animations.dart';
+import '../../../../core/utils/haptics.dart';
+import '../../../../core/utils/responsive.dart';
+import '../../../../core/widgets/liquid_glass/ambient_background.dart';
+import '../../../../core/widgets/liquid_glass/liquid_glass_button.dart';
+import '../../../../core/widgets/liquid_glass/liquid_glass_container.dart';
+import '../../domain/entities/game_phase.dart';
 import '../bloc/game_bloc.dart';
 import '../bloc/game_event.dart';
 import '../bloc/game_state.dart';
-import '../models/game_phase.dart';
-import '../utils/animations.dart';
-import '../utils/haptics.dart';
-import '../widgets/liquid_glass/ambient_background.dart';
-import '../widgets/liquid_glass/liquid_glass_button.dart';
-import '../widgets/liquid_glass/liquid_glass_container.dart';
 import '../widgets/game_card.dart';
 import '../widgets/player_carousel.dart';
 import '../widgets/score_board.dart';
@@ -44,6 +45,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = CupertinoTheme.of(context);
+    final r = Responsive(context);
 
     return AmbientBackground(
       child: BlocListener<GameBloc, GameState>(
@@ -87,7 +89,12 @@ class _GameScreenState extends State<GameScreen> {
                     SliverFillRemaining(
                       hasScrollBody: false,
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+                        padding: EdgeInsets.fromLTRB(
+                          r.padding,
+                          0,
+                          r.padding,
+                          32,
+                        ),
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 400),
                           reverseDuration: const Duration(milliseconds: 250),
@@ -149,11 +156,11 @@ class _GameScreenState extends State<GameScreen> {
           key: const ValueKey('spinning'),
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 20),
+            SizedBox(height: Responsive(context).scale(10, 20, 30)),
             Text(
               'Кто следующий?',
               style: theme.textTheme.navTitleTextStyle.copyWith(
-                fontSize: 28,
+                fontSize: Responsive(context).scale(24, 28, 32),
                 fontWeight: FontWeight.w800,
                 letterSpacing: -0.3,
               ),
@@ -168,7 +175,7 @@ class _GameScreenState extends State<GameScreen> {
                     : CupertinoColors.systemGrey2,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             wheel.SpinWheel(
               players: state.players,
               activeIndex: state.spinIndex,

@@ -2,15 +2,15 @@ import 'dart:math' show pi;
 
 import 'package:flutter/cupertino.dart';
 
-import '../models/player.dart';
-import 'liquid_glass/liquid_glass_container.dart';
+import '../../../../core/utils/responsive.dart';
+import '../../../../core/widgets/liquid_glass/liquid_glass_container.dart';
+import '../../domain/entities/player.dart';
 
 class SpinWheel extends StatefulWidget {
   final List<Player> players;
   final int activeIndex;
   final bool isSpinning;
   final ValueChanged<double>? onSwipe;
-  final VoidCallback? onTapSpin;
 
   const SpinWheel({
     super.key,
@@ -18,7 +18,6 @@ class SpinWheel extends StatefulWidget {
     required this.activeIndex,
     this.isSpinning = false,
     this.onSwipe,
-    this.onTapSpin,
   });
 
   @override
@@ -32,10 +31,10 @@ class _SpinWheelState extends State<SpinWheel>
   double _dragCurrentOffset = 0;
   bool _isDragging = false;
 
-  // Размеры карточки
-  static const double _cardWidth = 150;
-  static const double _cardHeight = 220;
-  static const double _cardGap = 40;
+  double get _cardWidth => 140;
+  double get _cardHeight => 200;
+  double get _cardGap => 32;
+  double get _itemExtent => _cardWidth + _cardGap;
 
   @override
   void initState() {
@@ -59,8 +58,6 @@ class _SpinWheelState extends State<SpinWheel>
     super.dispose();
   }
 
-  double get _itemExtent => _cardWidth + _cardGap;
-
   void _animateToIndex(int index) {
     if (!_scrollController.hasClients) return;
     final target = index * _itemExtent;
@@ -79,10 +76,10 @@ class _SpinWheelState extends State<SpinWheel>
   Widget build(BuildContext context) {
     final theme = CupertinoTheme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final r = Responsive(context);
 
     if (widget.players.isEmpty) return const SizedBox.shrink();
 
-    // Дублируем игроков для бесконечной иллюзии прокрутки
     final displayPlayers = [
       ...widget.players,
       ...widget.players,
@@ -91,11 +88,10 @@ class _SpinWheelState extends State<SpinWheel>
       ...widget.players,
     ];
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final centerOffset = screenWidth / 2 - _cardWidth / 2;
+    final centerOffset = r.width / 2 - _cardWidth / 2;
 
     return SizedBox(
-      height: 420,
+      height: r.scale(360, 400, 440),
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onHorizontalDragStart: widget.isSpinning
@@ -122,7 +118,6 @@ class _SpinWheelState extends State<SpinWheel>
                 if (velocity.abs() > 200) {
                   _startSpin(velocity);
                 } else {
-                  // Вернёмся к ближайшему элементу
                   final nearestIndex =
                       (_scrollController.offset / _itemExtent).round();
                   _scrollController.animateTo(
@@ -135,12 +130,14 @@ class _SpinWheelState extends State<SpinWheel>
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Карусель
             ListView.builder(
               controller: _scrollController,
               scrollDirection: Axis.horizontal,
               physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.only(left: centerOffset, right: centerOffset),
+              padding: EdgeInsets.only(
+                left: centerOffset,
+                right: centerOffset,
+              ),
               itemCount: displayPlayers.length,
               itemBuilder: (context, index) {
                 final player = displayPlayers[index];
@@ -150,14 +147,11 @@ class _SpinWheelState extends State<SpinWheel>
                 return _Card(
                   player: player,
                   isActive: isActive,
-                  isSpinning: widget.isSpinning,
                   cardWidth: _cardWidth,
                   cardHeight: _cardHeight,
                 );
               },
             ),
-
-            // Индикатор свайпа (показываем только когда не крутим)
             if (!widget.isSpinning)
               Positioned(
                 bottom: 0,
@@ -206,14 +200,12 @@ class _SpinWheelState extends State<SpinWheel>
 class _Card extends StatelessWidget {
   final Player player;
   final bool isActive;
-  final bool isSpinning;
   final double cardWidth;
   final double cardHeight;
 
   const _Card({
     required this.player,
     required this.isActive,
-    required this.isSpinning,
     required this.cardWidth,
     required this.cardHeight,
   });
@@ -225,8 +217,8 @@ class _Card extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeOutCubic,
-      width: cardWidth + 40,
-      height: cardHeight + 40,
+      width: cardWidth + 32,
+      height: cardHeight + 32,
       alignment: Alignment.center,
       child: Transform.rotate(
         angle: pi / 4,

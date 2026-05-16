@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
-import '../models/game_phase.dart';
-import 'liquid_glass/liquid_glass_button.dart';
-import 'liquid_glass/liquid_glass_container.dart';
+import '../../../../core/widgets/liquid_glass/liquid_glass_button.dart';
+import '../../../../core/widgets/liquid_glass/liquid_glass_container.dart';
+import '../../domain/entities/game_phase.dart';
 
 class GameCard extends StatelessWidget {
   final GamePhase phase;
@@ -17,11 +17,8 @@ class GameCard extends StatelessWidget {
   });
 
   Color _getColor() {
-    if (phase == GamePhase.showingTruth) {
-      return CupertinoColors.systemTeal;
-    } else if (phase == GamePhase.showingDare) {
-      return CupertinoColors.systemOrange;
-    }
+    if (phase == GamePhase.showingTruth) return CupertinoColors.systemTeal;
+    if (phase == GamePhase.showingDare) return CupertinoColors.systemOrange;
     return CupertinoColors.systemIndigo;
   }
 
@@ -32,7 +29,7 @@ class GameCard extends StatelessWidget {
   }
 
   IconData get _icon {
-    if (phase == GamePhase.showingTruth) return CupertinoIcons.chat_bubble;
+    if (phase == GamePhase.showingTruth) return CupertinoIcons.chat_bubble_2_fill;
     return CupertinoIcons.bolt_fill;
   }
 

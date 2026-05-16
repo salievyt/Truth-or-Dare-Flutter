@@ -19,14 +19,14 @@ class AmbientBackground extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: isDark
               ? [
-                  const Color(0xFF0F0F1B),
-                  const Color(0xFF1A1A2E),
-                  const Color(0xFF16213E),
+                  const Color(0xFF0A0A14),
+                  const Color(0xFF12122A),
+                  const Color(0xFF0F1629),
                 ]
               : [
-                  const Color(0xFFF0F4F8),
-                  const Color(0xFFE8ECF1),
-                  const Color(0xFFF5F0FA),
+                  const Color(0xFFEEF2F7),
+                  const Color(0xFFE8EDF3),
+                  const Color(0xFFF3F0F8),
                 ],
         ),
       ),

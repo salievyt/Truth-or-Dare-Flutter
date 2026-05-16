@@ -29,9 +29,7 @@ class LiquidGlassButton extends StatelessWidget {
         ? CupertinoColors.systemBlue.withValues(alpha: 0.35)
         : CupertinoColors.systemBlue.withValues(alpha: 0.75);
 
-    final defaultTextColor = isDark
-        ? CupertinoColors.white
-        : CupertinoColors.white;
+    final defaultTextColor = isDark ? CupertinoColors.white : CupertinoColors.white;
 
     return GestureDetector(
       onTap: onPressed,

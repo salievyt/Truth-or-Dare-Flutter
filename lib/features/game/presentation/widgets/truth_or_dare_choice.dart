@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import 'liquid_glass/liquid_glass_button.dart';
+import '../../../../core/widgets/liquid_glass/liquid_glass_button.dart';
 
 class TruthOrDareChoice extends StatelessWidget {
   final VoidCallback onTruth;

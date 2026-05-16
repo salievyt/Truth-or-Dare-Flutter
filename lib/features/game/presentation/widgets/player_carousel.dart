@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 
-import '../models/player.dart';
+import '../../domain/entities/player.dart';
 
 class PlayerCarousel extends StatefulWidget {
   final List<Player> players;
@@ -77,7 +77,6 @@ class _PlayerCarouselState extends State<PlayerCarousel> {
                 ),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOutCubic,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 14,

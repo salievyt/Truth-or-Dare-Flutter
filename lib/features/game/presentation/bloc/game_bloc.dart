@@ -2,16 +2,18 @@ import 'dart:math';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../data/questions.dart';
-import '../models/game_phase.dart';
-import '../models/player.dart';
+import '../../data/datasources/game_local_datasource.dart';
+import '../../data/datasources/questions_local_datasource.dart';
+import '../../domain/entities/game_phase.dart';
 import 'game_event.dart';
 import 'game_state.dart';
 
 class GameBloc extends Bloc<GameEvent, GameState> {
+  final GameLocalDataSource _gameDS;
+  final QuestionsLocalDataSource _questionsDS;
   final Random _random = Random();
 
-  GameBloc() : super(const GameState()) {
+  GameBloc(this._gameDS, this._questionsDS) : super(const GameState()) {
     on<AddPlayer>(_onAddPlayer);
     on<RemovePlayer>(_onRemovePlayer);
     on<StartGame>(_onStartGame);
@@ -23,66 +25,58 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 
   void _onAddPlayer(AddPlayer event, Emitter<GameState> emit) {
-    final newPlayer = Player(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: event.name.trim(),
-    );
-    emit(state.copyWith(players: [...state.players, newPlayer]));
+    _gameDS.addPlayer(event.name);
+    emit(state.copyWith(players: _gameDS.players));
   }
 
   void _onRemovePlayer(RemovePlayer event, Emitter<GameState> emit) {
-    final updated = state.players.where((p) => p.id != event.playerId).toList();
-    emit(state.copyWith(players: updated));
+    _gameDS.removePlayer(event.playerId);
+    emit(state.copyWith(players: _gameDS.players));
   }
 
   void _onStartGame(StartGame event, Emitter<GameState> emit) {
-    if (state.players.isEmpty) return;
+    if (_gameDS.players.isEmpty) return;
     emit(state.copyWith(
       phase: GamePhase.spinning,
-      currentPlayerId: state.players.first.id,
+      currentPlayerId: _gameDS.players.first.id,
       currentRound: 1,
     ));
   }
 
   void _onSpinWheel(SpinWheel event, Emitter<GameState> emit) async {
-    if (state.players.isEmpty || state.isSpinning) return;
+    if (_gameDS.players.isEmpty || state.isSpinning) return;
 
     emit(state.copyWith(isSpinning: true));
 
-    // Базовые спины + бонус от velocity свайпа
     int baseSpins = 12;
     if (event.velocity != null) {
       baseSpins += (event.velocity!.abs() / 800).toInt().clamp(0, 25);
     }
     final int totalSpins = baseSpins + _random.nextInt(8);
-    final int selectedIndex = _random.nextInt(state.players.length);
+    final int selectedIndex = _random.nextInt(_gameDS.players.length);
 
-    // Физика: ускорение -> постоянная скорость -> замедление
     final int accelEnd = (totalSpins * 0.15).toInt();
     final int decelStart = (totalSpins * 0.65).toInt();
 
     for (int i = 0; i < totalSpins; i++) {
       int delayMs;
       if (i < accelEnd) {
-        // Ускорение: от 180мс до 60мс
         final progress = i / accelEnd;
         delayMs = (180 - progress * 120).toInt();
       } else if (i < decelStart) {
-        // Постоянная скорость
         delayMs = 55;
       } else {
-        // Замедление: от 60мс до 350мс
         final progress = (i - decelStart) / (totalSpins - decelStart);
         delayMs = (60 + progress * progress * 350).toInt();
       }
 
       await Future.delayed(Duration(milliseconds: delayMs));
-      emit(state.copyWith(spinIndex: i % state.players.length));
+      emit(state.copyWith(spinIndex: i % _gameDS.players.length));
     }
 
     await Future.delayed(const Duration(milliseconds: 400));
 
-    final selectedPlayer = state.players[selectedIndex];
+    final selectedPlayer = _gameDS.players[selectedIndex];
     emit(state.copyWith(
       phase: GamePhase.selecting,
       currentPlayerId: selectedPlayer.id,
@@ -92,23 +86,21 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 
   void _onSelectTruth(SelectTruth event, Emitter<GameState> emit) {
-    final question = truthQuestions[_random.nextInt(truthQuestions.length)];
     emit(state.copyWith(
       phase: GamePhase.showingTruth,
-      currentCard: question,
+      currentCard: _questionsDS.getRandomTruth(),
     ));
   }
 
   void _onSelectDare(SelectDare event, Emitter<GameState> emit) {
-    final dare = dareActions[_random.nextInt(dareActions.length)];
     emit(state.copyWith(
       phase: GamePhase.showingDare,
-      currentCard: dare,
+      currentCard: _questionsDS.getRandomDare(),
     ));
   }
 
   void _onCompleteTask(CompleteTask event, Emitter<GameState> emit) {
-    final updatedPlayers = state.players.map((p) {
+    final updatedPlayers = _gameDS.players.map((p) {
       if (p.id == state.currentPlayerId) {
         if (state.phase == GamePhase.showingTruth) {
           return p.copyWith(truthCount: p.truthCount + 1);
@@ -127,6 +119,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 
   void _onResetGame(ResetGame event, Emitter<GameState> emit) {
+    _gameDS.reset();
     emit(const GameState());
   }
 }
